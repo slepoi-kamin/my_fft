@@ -12,10 +12,12 @@ def tmp_file(tmp_path):
     temp_file.write_text(CONTENT)
     return temp_file
 
+
 @pytest.fixture
 def td(tmp_file):
     td = TimeData(tmp_file)
     return td
+
 
 @pytest.fixture
 def tmp_file_not_exists():
@@ -25,13 +27,15 @@ def tmp_file_not_exists():
 class TestTimeData:
 
     def test_init(self, td):
-        epected_dict = {
+        expected_dict = {
             'time': [1.0, 4.0],
             'data1': [2.0, 5.0],
             'data2': [3.0, 6.0],
         }
         assert td.text_data == CONTENT
-        assert td.data == epected_dict
+        assert td.data == expected_dict
+        # noinspection PyProtectedMember
+        assert td._fft is None
 
 
 class TestMakeDictFromData:
@@ -322,37 +326,3 @@ class TestGetFunctionInfo:
         assert get_function_info() == current_func_info, \
             f'ValueError: get_function_info() == \n{get_function_info()}\n' \
             f'    Expected: \n{current_func_info} '
-
-
-# @pytest.mark.parametrize('f_name, data', [
-#     ('test_data1.txt', 'Time\tdata1\tdata2\n'
-#                        '0.001\t0.0\t0.0\n'
-#                        '0.001\t0.0\t1.0\n'
-#                        '0.001\t1.0\t0.0\n'
-#                        '0.001\t1.0\t1.0\n'),
-#     ('test_data2.txt', 'Time\tdata1\tdata2\n'
-#                        '0.001 0.0\t 0.0\n'
-#                        '0.001\t 0.0    1.0\n'
-#                        '0.001 ,1.0\t0.0\n'
-#                        '0.001\t  1.0,  1.0\n'),
-# ])
-# def test_time_data_init(f_name, data):
-#     with open(f_name, 'w') as file:
-#         file.write(data)
-
-
-# @pytest.mark.parametrize('f_name, data', [
-#     ('test_data1.txt', 'Time\tdata1\tdata2\n'
-#                        '0.001\t0.0\t0.0\n'
-#                        '0.001\t0.0\t1.0\n'
-#                        '0.001\t1.0\t0.0\n'
-#                        '0.001\t1.0\t1.0\n'),
-#     ('test_data2.txt', 'Time\tdata1\tdata2\n'
-#                        '0.001 0.0\t 0.0\n'
-#                        '0.001\t 0.0    1.0\n'
-#                        '0.001 ,1.0\t0.0\n'
-#                        '0.001\t  1.0,  1.0\n'),
-# ])
-# def test_time_data_init(f_name, data):
-#     with open(f_name, 'w') as file:
-#         file.write(data)

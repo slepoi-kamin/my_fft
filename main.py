@@ -5,10 +5,14 @@ import re
 
 
 class TimeData:
+    """
+    Contains time dada and frequency analysis data.
+    """
 
     def __init__(self, path: pathlib.Path):
         self.__set_text_data(path)
         self.__set_data()
+        self._fft = None
 
     def __set_text_data(self, path: pathlib.Path):
         self.text_data = read_from_file(path)
@@ -16,6 +20,16 @@ class TimeData:
     def __set_data(self):
         handled_data = handle_text_data(self.text_data)
         self.data = make_dict_from_data(handled_data)
+
+    @property
+    def fft(self):
+        if self._fft is None:
+            self._set_fft()
+        return self.fft
+
+    def _set_fft(self):
+        self._fft = {key: calc_fft_recursively(self.data[key])
+                     for key in self.data if key.lower != 'time'}
 
 
 def make_dict_from_data(list_data):
@@ -195,5 +209,3 @@ def get_function_info():
 
 if __name__ == '__main__':
     pass
-
-
