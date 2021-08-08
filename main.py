@@ -50,10 +50,7 @@ def remove_elements(iter_data, value):
     :param value: element value or tuple of elements values
     """
     if is_type_is(iter_data, (list, tuple)):
-        if not any(isinstance(value, iter_type) for iter_type in (list, tuple)):
-            iterable_value = [value]
-        else:
-            iterable_value = value
+        iterable_value = make_it_list(value)
         clear_data = [x for x in iter_data if all([x != y for y in iterable_value])]
         return clear_data
 
@@ -70,15 +67,23 @@ def is_type_is(my_data, data_type):
     Check if type od data is suggested type and generates TypeError in other case.
     Like function isinstance, but with raising exception.
     """
-    if not any(isinstance(data_type, iter_type) for iter_type in (list, tuple)):
-        iter_data_type = [data_type]
-    else:
-        iter_data_type = data_type
+    iter_data_type = make_it_list(data_type)
     if not any(isinstance(my_data, d_type) for d_type in iter_data_type):
         raise TypeError(f'Wrong type of input data. Expected data type: {data_type}.\n'
                         f'{get_function_info()} \n'
                         f'Inputted data type: {type(my_data)}.')
     return True
+
+
+def make_it_list(value):
+    """
+    Check if value is list or tuple. If it is not make list(value).
+    """
+    if not any(isinstance(value, iter_type) for iter_type in (list, tuple)):
+        iter_data_type = [value]
+    else:
+        iter_data_type = value
+    return iter_data_type
 
 
 # TODO: add tuple possibility for char
