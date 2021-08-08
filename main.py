@@ -7,10 +7,50 @@ import re
 class TimeData:
 
     def __init__(self, path: pathlib.Path):
-        self.__import_time_data(path)
+        self.__set_text_data(path)
+        self.__set_data()
 
-    def __import_time_data(self, path: pathlib.Path):
-        read_from_file(path)
+    def __set_text_data(self, path: pathlib.Path):
+        self.text_data = read_from_file(path)
+
+    def __set_data(self):
+        handled_data = handle_text_data(self.text_data)
+        self.data = make_dict_from_data(handled_data)
+
+
+def make_dict_from_data(list_data):
+    if is_columns_have_names(list_data):
+        col_names = list_data[0]
+        data = transpose_list(list_data[1:])
+        return {col_names[i]: make_data_float(data[i]) for i in range(len(col_names))}
+    else:
+        raise ValueError(f'No column with name "test" at [0][0] position of data.\n'
+                         f'{get_function_info()} \n'
+                         f'Inputted data: {list_data}.')
+
+
+def make_data_float(input_data):
+    if isinstance(input_data, list):
+        float_data = [make_data_float(elm) for elm in input_data]
+    else:
+        float_data = float(input_data)
+    return float_data
+
+
+def is_columns_have_names(data):
+    if data[0][0].lower() == 'time':
+        return True
+    else:
+        return False
+
+
+def transpose_list(list_data):
+    """
+    Transpose list.
+    :param list_data: list
+    :return: list
+    """
+    return list(map(list, zip(*list_data)))
 
 
 def read_from_file(path):
@@ -41,7 +81,7 @@ def del_comment_lines(text_data_list: list[str]):
             for symbol in ('#', '!', '$'):
                 if symbol in text_data:
                     text_data_list[i] = text_data[:text_data.find(symbol)].strip()
-        return text_data_list
+        return remove_elements(text_data_list, '')
 
 
 def remove_elements(iter_data, value):
@@ -56,11 +96,17 @@ def remove_elements(iter_data, value):
         return clear_data
 
 
-# TODO: finish this function
 def handle_text_data(text_data):
-    string_data = split_text(text_data)
-
-    clear_string_data = del_comment_lines(string_data)
+    """
+    Handling text data.
+    :param text_data: str
+    :return: list[list]
+    """
+    if is_type_is(text_data, str):
+        string_data = split_text(text_data, '\n')
+        clear_string_data = del_comment_lines(string_data)
+        return [split_text(x, ('\t', ' ', ','))
+                for x in remove_elements(clear_string_data, [[]])]
 
 
 def is_type_is(my_data, data_type):
@@ -88,6 +134,12 @@ def make_it_list(value):
 
 
 def split_text(text, char):
+    """
+    Split string with chars and remove all empty strings ''.
+    :param text: string
+    :param char: char or list/ tuple of chars
+    :return: list
+    """
     iter_char = make_it_list(char)
     if is_type_is(text, str) and all(char not in text for char in iter_char):
         raise ValueError(f'No symbol {char} in string.\n'
@@ -95,15 +147,6 @@ def split_text(text, char):
                          f'Inputted string: {text}.')
     else:
         return remove_elements(re.split('|'.join(iter_char), text), '')
-        # return list(map(lambda x: x.strip(), text.split(char)))
-
-
-# def split_data_to_list_of_str(text_data):
-#     if '\n' not in text_data:
-#         raise ValueError(f'No strings in data.\n'
-#                          f'{get_function_info()} \n'
-#                          f'Inputted data: {text_data}.')
-#     return text_data.split('\n')
 
 
 def calc_fft_recursively(data):
@@ -144,15 +187,8 @@ def get_function_info():
            f'function name: {info_object[3]}.'
     return info
 
+
 if __name__ == '__main__':
     pass
-    # print(' '.join("%5.3f" % abs(f)
-    #                for f in calc_fft_recursively([1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0])))
-
-    # data = 'Time \tdata1 ,data2\n' \
-    #        '0.001 0.0\t 0.0 \n' \
-    #        ' 0.001\t 0.0    1.0 \n' \
-    #        '0.001 ,1.0\t0.0\n' \
-    #        '0.001\t  1.0,  1.0\n'
 
 

@@ -15,6 +15,77 @@ def tmp_file_not_exists():
     return pathlib.Path(uuid.uuid4().hex)
 
 
+class TestMakeDictFromData:
+
+    def test_some_args(self):
+        arg = [
+            ['time', 'data1', 'data2'],
+            ['1', '2', '3'],
+            ['4', '5', '6'],
+        ]
+        expected = {
+            'time': [1.0, 4.0],
+            'data1': [2.0, 5.0],
+            'data2': [3.0, 6.0],
+        }
+        assert make_dict_from_data(arg) == expected
+
+    def test_value_error(self):
+        with pytest.raises(ValueError):
+            make_dict_from_data([['1', '2']])
+
+
+class TestTransposeList:
+
+    @pytest.mark.parametrize('args, expected', [
+        ([[1, 2], [3, 4]], [[1, 3], [2, 4]]),
+    ])
+    def test_some_data(self, args, expected):
+        assert transpose_list(args) == expected
+
+
+class TestIsColumnsHaveNames:
+
+    def test_true(self):
+        arg = [['Time']]
+        assert is_columns_have_names(arg) is True
+
+    def test_false(self):
+        arg = [['tim']]
+        assert is_columns_have_names(arg) is False
+
+
+class TestMakeDataFloat:
+
+    @pytest.mark.parametrize('args, expected', [
+        ('1', 1.0),
+        (1, 1.0),
+        (['1', '2'], [1.0, 2.0]),
+        ([['1', '2'], [3, 4]], [[1.0, 2.0], [3.0, 4.0]]),
+    ])
+    def test_some_args(self, args, expected):
+        assert make_data_float(args) == expected
+
+
+class TestHandleTextData:
+
+    def test_wrong_args_format(self):
+        with pytest.raises(TypeError):
+            handle_text_data([1, 2])
+
+    def test_some_args(self):
+        args = '! comment\n' \
+               '\n' \
+               'abc abc, abc # comment \n' \
+               '$ comment \n' \
+               ' abc\t abc\tabc\n' \
+               'abc abc,abc'
+        expected = [['abc', 'abc', 'abc'],
+                    ['abc', 'abc', 'abc'],
+                    ['abc', 'abc', 'abc']]
+        assert handle_text_data(args) == expected
+
+
 class TestMakeItList:
 
     @pytest.mark.parametrize('args, expected', [
@@ -24,7 +95,7 @@ class TestMakeItList:
         assert make_it_list(args) == expected
 
 
-class TestRemoveValues:
+class TestRemoveElements:
 
     @pytest.mark.parametrize('args', [
         ('a', 'str'),
@@ -41,6 +112,7 @@ class TestRemoveValues:
         ((['a', '', 'a'], ('', 'a')), []),
         ((['a', '', 'b', 'c'], ['', 'a']), ['b', 'c']),
         ((('a', '', 'a'), ''), ['a', 'a']),
+        ((['a', [], 'a'], [[]]), ['a', 'a']),
     ])
     def test_some_data(self, args, expected):
         assert remove_elements(*args) == expected
@@ -151,7 +223,7 @@ class TestDelCommentLines:
 
     @pytest.mark.parametrize('args, expected', [
         ([], []),
-        (['#aaa'], ['']),
+        (['#aaa'], []),
         (['a!aa'], ['a']),
         (['aaa$'], ['aaa']),
         ([' a a #aa'], ['a a']),
