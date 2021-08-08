@@ -3,16 +3,35 @@ import uuid
 from main import *
 
 
+CONTENT = 'time data1 data2\n1 2 3\n4 5 6'
+
+
 @pytest.fixture
 def tmp_file(tmp_path):
     temp_file = tmp_path / "tmp_file"
-    temp_file.write_text('CONTENT')
+    temp_file.write_text(CONTENT)
     return temp_file
 
+@pytest.fixture
+def td(tmp_file):
+    td = TimeData(tmp_file)
+    return td
 
 @pytest.fixture
 def tmp_file_not_exists():
     return pathlib.Path(uuid.uuid4().hex)
+
+
+class TestTimeData:
+
+    def test_init(self, td):
+        epected_dict = {
+            'time': [1.0, 4.0],
+            'data1': [2.0, 5.0],
+            'data2': [3.0, 6.0],
+        }
+        assert td.text_data == CONTENT
+        assert td.data == epected_dict
 
 
 class TestMakeDictFromData:
@@ -245,7 +264,7 @@ class TestReadFromFile:
             read_from_file(*args)
 
     def test_file_content(self, tmp_file):
-        assert read_from_file(tmp_file) == 'CONTENT'
+        assert read_from_file(tmp_file) == CONTENT
 
 
 class TestCalcFFTRecursively:
@@ -270,7 +289,7 @@ class TestCalcFFTRecursively:
     def test_calc_fft_recursively_full(self):
         test_input = [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
         expected = [4.0, 2.613, 0.0, 1.082, 0.0, 1.082, 0.0, 2.613]
-        abs_complex = [round(abs(complex), 3) for complex in calc_fft_recursively(test_input)]
+        abs_complex = [round(abs(compl), 3) for compl in calc_fft_recursively(test_input)]
         assert abs_complex == expected, \
             f'ValueError: [round(abs(complex), 3) for complex ' \
             f'in calc_fft_recursively({test_input}) ' \

@@ -19,6 +19,11 @@ class TimeData:
 
 
 def make_dict_from_data(list_data):
+    """
+    Check if "time" is first column name. Transpose data and float it.
+    :param list_data: list
+    :return: dict
+    """
     if is_columns_have_names(list_data):
         col_names = list_data[0]
         data = transpose_list(list_data[1:])
