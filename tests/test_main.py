@@ -15,6 +15,15 @@ def tmp_file_not_exists():
     return pathlib.Path(uuid.uuid4().hex)
 
 
+class TestMakeItList:
+
+    @pytest.mark.parametrize('args, expected', [
+        ('a', ['a']), ((1, 2), (1, 2)), ([1, 2], [1, 2]),
+    ])
+    def test_some_args(self, args, expected):
+        assert make_it_list(args) == expected
+
+
 class TestRemoveValues:
 
     @pytest.mark.parametrize('args', [

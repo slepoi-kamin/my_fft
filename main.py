@@ -80,10 +80,10 @@ def make_it_list(value):
     Check if value is list or tuple. If it is not make list(value).
     """
     if not any(isinstance(value, iter_type) for iter_type in (list, tuple)):
-        iter_data_type = [value]
+        iter_value = [value]
     else:
-        iter_data_type = value
-    return iter_data_type
+        iter_value = value
+    return iter_value
 
 
 # TODO: add tuple possibility for char
