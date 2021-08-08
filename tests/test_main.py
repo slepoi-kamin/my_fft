@@ -106,9 +106,24 @@ class TestSplitText:
     @pytest.mark.parametrize('args, expected', [
         (('a!a$a#a\na\ta', '\n'), ['a!a$a#a', 'a\ta']),
         (('a!a$a#a\na\ta', '\t'), ['a!a$a#a\na', 'a']),
-        (('a!a$a#  a\na\ta', ' '), ['a!a$a#', '', 'a\na\ta']),
+        (('a!a$a#  a\na\ta', ' '), ['a!a$a#', 'a\na\ta']),
     ])
-    def test_some_dsta(self, args, expected):
+    def test_some_data(self, args, expected):
+        assert split_text(*args) == expected
+
+    @pytest.mark.parametrize('args', [
+        ('ccacbccbcaa', ('g', 'h')),
+        ('ccacbccbcaa', ['g', 'h']),
+    ])
+    def test_value_error_with_list_of_chars(self, args):
+        with pytest.raises(ValueError):
+            split_text(*args)
+
+    @pytest.mark.parametrize('args, expected', [
+        (('ccacbccbcaa', ('a', 'b')), ['cc', 'c', 'cc', 'c']),
+        (('ccacbccbcaa', ['a', 'j']), ['cc', 'cbccbc']),
+    ])
+    def test_some_args_with_list_of_chars(self, args, expected):
         assert split_text(*args) == expected
 
 

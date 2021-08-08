@@ -1,6 +1,7 @@
 from cmath import exp, pi
 import pathlib
 import inspect
+import re
 
 
 class TimeData:
@@ -86,14 +87,15 @@ def make_it_list(value):
     return iter_value
 
 
-# TODO: add tuple possibility for char
 def split_text(text, char):
-    if is_type_is(text, str) and char not in text:
+    iter_char = make_it_list(char)
+    if is_type_is(text, str) and all(char not in text for char in iter_char):
         raise ValueError(f'No symbol {char} in string.\n'
                          f'{get_function_info()} \n'
                          f'Inputted string: {text}.')
     else:
-        return list(map(lambda x: x.strip(), text.split(char)))
+        return remove_elements(re.split('|'.join(iter_char), text), '')
+        # return list(map(lambda x: x.strip(), text.split(char)))
 
 
 # def split_data_to_list_of_str(text_data):
