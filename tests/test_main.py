@@ -1,6 +1,6 @@
 import pytest
 import uuid
-from main import *
+from My_fft.my_fft import *
 
 
 CONTENT = 'time data1 data2\n1 2 3\n4 5 6'
